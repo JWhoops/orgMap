@@ -65,11 +65,11 @@ const utilityDB = (() => {
   //read database using regex
   const readDBbyRegexKey = (regexKey, schema, callback) => {
     schema.find({
-        key: new RegExp(regexKey, "i")
-      }, {
-        _id: false,
-        __v: false
-      },
+      key: new RegExp(regexKey, "i")
+    }, {
+      _id: false,
+      __v: false
+    },
       (err, result) => {
         if (err) console.log(err)
         callback(result)
@@ -195,10 +195,14 @@ const utilityDB = (() => {
     Building.findOne({
       "key": key
     }, (err, result) => {
+      if (!result) {
+        callback({ "success": false, "error": "Building key is not found!!!" })
+        return;
+      }
       result.utilities.push(utility)
       result.save((err) => {
-        if (err) console.log(err)
-        callback(result)
+        if (err) callback({ "success": false, "error": err })
+        else callback({ "success": true, "message": "utility is uploaded" })
       })
     });
   }
@@ -250,15 +254,15 @@ const utilityDB = (() => {
       building.key = "USWISCUWMAD" + building.key
     })
     populateBuildings({
-        name: "United States",
-        key: "US"
-      }, {
-        name: "Wisconsin",
-        key: "USWISC"
-      }, {
-        name: "University of Wisconsin-Madison",
-        key: "USWISCUWMAD"
-      },
+      name: "United States",
+      key: "US"
+    }, {
+      name: "Wisconsin",
+      key: "USWISC"
+    }, {
+      name: "University of Wisconsin-Madison",
+      key: "USWISCUWMAD"
+    },
       buildings) //insert building list into database
   }
   // populateMadison()
