@@ -2,7 +2,7 @@
 <pre>
 Key definition:
 STR: US WISC UWMAD MSHUM F001 2250x
-LEN: 2    4         5             5            4       5
+LEN: 2    4    5     5    4     5
 
 eg:
 
