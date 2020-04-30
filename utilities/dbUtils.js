@@ -1,20 +1,76 @@
+
 const utilityDB = (() => {
-  //quire schema
   let mongoose = require("mongoose"),
     Country = require("../models/country"),
     State = require("../models/state"),
     Institution = require("../models/institution"),
     Building = require("../models/building"),
     Floor = require("../models/floor"),
-    Room = require("../models/room")
+    Room = require("../models/room"),
+    Code = require("../models/code"),
+    nodemailer = require("nodemailer");
 
-  // connect DB
   mongoose.connect("mongodb://aa5330593:aa5330593@ds249583.mlab.com:49583/utility_map", {
     useNewUrlParser: true,
     useUnifiedTopology: true
   })
 
-  //create one record if not exists
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: "username", // generated ethereal user
+      pass: "password" // generated ethereal password
+    }
+  });
+
+  const createCode = (email, callback) => {
+    let code = [];
+    for (let i = 0; i < 6; i++) {
+      code[i] = Math.floor(Math.random() * 10) + 1;
+    }
+    Code.findOne({ email: email }, (err, rCode) => {
+      if (!rCode) {
+        code = new Code({ email: email, code: code.join("") })
+        code.save(async (err, result) => {
+          await transporter.sendMail({
+            from: 'campusMap@gmail.com',
+            to: email,
+            subject: "Verification Code From Campus Mail",
+            text: "Hi there,\n\n Here is your verification code: " + code.code
+          });
+          let resCode = { email: code.email, message: "code has sent" }
+          callback(resCode);
+        })
+      } else {
+        callback({ result: "Code has sent!" });
+      }
+    })
+  }
+
+  const verifyCode = (codeObj, callback) => {
+    Code.findOne({
+      email: codeObj.email
+    }, (err, resultCode) => {
+      if (err) {
+        callback({ success: false, verified: false });
+        return
+      }
+      if (resultCode && resultCode.code === codeObj.code) {
+        Code.deleteOne({ email: codeObj.email }, (err, result) => {
+          if (err) {
+            callback({ success: false, verified: false });
+            return
+          }
+          callback({ success: true, verified: true });
+        })
+      } else {
+        callback({ success: true, verified: false });
+      }
+    })
+  }
+
+
+
   const createIfNotExists = (obj, schema) => {
     schema.findOne({
       key: obj.key
@@ -282,7 +338,9 @@ const utilityDB = (() => {
     insertUtility,
     populateMadison,
     verifyUtility,
-    getJSONByKey
+    getJSONByKey,
+    createCode,
+    verifyCode
   }
 })()
 

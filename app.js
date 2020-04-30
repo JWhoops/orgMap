@@ -16,7 +16,6 @@ app.get("/location/:location", (req, res) => {
     res.jsonp({ current, next })
   })
 })
-
 /**
  * insert utility to a building
  */
@@ -34,6 +33,27 @@ app.post("/verification", jsonParser, (req, res) => {
   let { key, utility } = req.body;
   DBUtilities.verifyUtility(key, utility, (updateRes) => {
     res.send(JSON.stringify(updateRes));
+  })
+})
+
+/**
+ * Get Verification Code
+ */
+app.post("/get_code", jsonParser, async (req, res) => {
+  let { email } = req.body;
+  DBUtilities.createCode(email, (result) => {
+    res.send(JSON.stringify(result));
+  });
+})
+
+/**
+ * Verify code
+ */
+app.post("/verify_code", jsonParser, (req, res) => {
+  let { email, code } = req.body;
+  let codeObj = { email: email, code: code };
+  DBUtilities.verifyCode(codeObj, (result) => {
+    res.send(JSON.stringify(result));
   })
 })
 
