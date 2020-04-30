@@ -78,10 +78,8 @@ const utilityDB = (() => {
   //get current and next level
   const getCurrentAndNextLevel = (queryKey, currentSchema, nextSchema, callback) => {
     readDBbyKey(queryKey, currentSchema, (fCurrent) => {
-      // search by starting with the key of current level
+      // using regex to match start with key 
       readDBbyRegexKey('^' + queryKey, nextSchema, (fNext) => {
-        /*too lazy to create find by key using findOne
-        use [0] to substitute*/
         fCurrent = fCurrent[0]
         callback(fCurrent, fNext)
       })
