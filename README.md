@@ -30,7 +30,7 @@ Buildings:[‘MSHUM’:‘Moose Humanity’,’HElCW’:’Helen C White’,...]
 
 2. /utility:
 <pre>
-How to insert an utility to building
+How to insert an utility to building:
 1. Get building keys first.
 2. POST to /utility with body format like:
 <code>
@@ -41,4 +41,21 @@ How to insert an utility to building
 }
 </code>
 Utility will be in database, by it will need to be verified.
+</pre>
+
+3. /verification:
+<pre>
+How to verify an utility:
+1. Get building keys first.
+2. POST to /verification with body format like:
+<code>
+{
+    "utility": {
+        "type": "printer",
+        "description": "this is a test printer"
+    },
+    "key": "USWISCUWMADMSHMB"
+}
+</code>
+Utility in database will be verified if return success
 </pre>
