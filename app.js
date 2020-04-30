@@ -1,40 +1,13 @@
 const express = require("express"),
   bodyParser = require("body-parser"),
-  DBUtilities = require("./utilities/dbUtils"),
-  passport = require("passport"),
-  LocalStrategy = require("passport-local"),
-  User = require("./models/user")
+  DBUtilities = require("./utilities/dbUtils");
 
-//routes
-const authRoutes = require("./routes/auth")
-
-//app configs
 const app = express()
-
-//some secret values
-const my_secret = "Desperate for Half-Life 3, Please Gabe!!!!!!"
-
-app.use(require("express-session")({
-  secret: my_secret,
-  resave: false,
-  saveUninitialized: false
-}))
-
-//passport config
-app.use(passport.initialize())
-app.use(passport.session())
-
-passport.use(new LocalStrategy(User.authenticate()));
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
-
 
 app.set('view engine', 'ejs')
 // create application/json parser
 var jsonParser = bodyParser.json()
-// create application/x-www-form-urlencoded parser
-var urlencodedParser = bodyParser.urlencoded({ extended: false })
-// dumb icon
+app.use(bodyParser.urlencoded({ extended: true }));
 app.get('/favicon.ico', (req, res) => res.status(204));
 
 //location route
@@ -45,25 +18,28 @@ app.get("/get/:location", (req, res) => {
   })
 })
 
-//root route
-app.get("/", (req, res) => {
-  res.render("index")
-})
-
 app.post("/utility", jsonParser, (req, res) => {
-  let utility = { key: req.body.key, description: req.body.description, type: req.body.type };
+  let utility = { key: req.body.key, description: req.body.description, type: req.body.type, verified: false };
   DBUtilities.insertUtility(utility.key, utility, (bd) => {
     res.send(JSON.stringify(bd))
   })
 })
 
-//auth routers
-app.use((req, res, next) => {
-  res.locals.currentUser = req.user
-  next()
+app.get("/login", (req, res) => {
+  res.render('login');
 })
 
-app.use(authRoutes)
+app.post("/verification", jsonParser, (req, res) => {
+  let { key, utility } = req.body;
+  DBUtilities.updateUtility(key, utility, (updateRes) => {
+    res.send(JSON.stringify(updateRes));
+  })
+})
+
+// app.get("/populate", (req, res) => {
+//   DBUtilities.populateMadison();
+//   res.send("success")
+// })
 
 //app.listen(process.env.PORT,process.env.IP,()=>{
 

@@ -140,7 +140,6 @@ const utilityDB = (() => {
   // Read Asynchrously
   const getJsonObj = (path) => {
     var fs = require("fs");
-    console.log("\n *START READING JSON* \n");
     var content = JSON.parse(fs.readFileSync(path));
     return content;
   }
@@ -190,6 +189,26 @@ const utilityDB = (() => {
     }
     return result;
   }
+  const updateUtility = (key, utility, callback) => {
+    Building.findOne({
+      "key": key
+    }, (err, result) => {
+      if (!result) {
+        callback({ "success": false, "error": "Building key is not found!!!" })
+        return;
+      }
+      for (let i = 0; i < result.utilities.length; i++) {
+        if (utility.description === result.utilities[i].description) {
+          result.utilities[i].verified = true;
+        }
+      }
+      result.save((err) => {
+        if (err) callback({ "success": false, "error": err })
+        else callback({ "success": true, "message": "utility is verified" })
+      })
+    });
+  }
+
   //insert utility for buildings
   const insertUtility = (key, utility, callback) => {
     Building.findOne({
@@ -221,31 +240,26 @@ const utilityDB = (() => {
         lng: bdObj.coordinates[0],
         name: bdObj.name,
         key: bdObj.key,
-        image: bdObj.image
       })
       bd.save()
     })
   }
 
-  const populateMadison = () => {
-    //read buildings and microwaves json files
+  function populateMadison() {
     let buildings = getJsonObj('./test_jsons/buildings.json').buildings
     let microwaves = getJsonObj('./test_jsons/Microwaves.json').microwaves
     let printers = getJsonObj('./test_jsons/Printers.json').printers
     buildings.forEach((building) => {
-      building.image = "http://cdn.redalertpolitics.com/files/2017/10/UW-Madison-lincoln.jpg"
       let utility = []
       microwaves.forEach((microwave) => {
         if (building.key === microwave.key) {
-          //push utilites into building's utilities array using same key
-          microwave.image = "http://cdn.wrn.com/wp-content/uploads/2016/01/Motion-W.jpg"
+          microwave["verified"] = true;
           utility.push(microwave)
         }
       })
       printers.forEach((printer) => {
         if (building.key === printer.key) {
-          //push utilites into building's utilities array using same key
-          printer.image = "http://cdn.wrn.com/wp-content/uploads/2016/01/Motion-W.jpg"
+          printer["verified"] = true;
           utility.push(printer)
         }
       })
@@ -263,13 +277,14 @@ const utilityDB = (() => {
       name: "University of Wisconsin-Madison",
       key: "USWISCUWMAD"
     },
-      buildings) //insert building list into database
+      buildings)
   }
-  // populateMadison()
   return {
     getJSONByKey,
     insertByLevel,
-    insertUtility
+    insertUtility,
+    populateMadison,
+    updateUtility,
   }
 })()
 

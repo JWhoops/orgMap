@@ -2,7 +2,7 @@ var mongoose = require("mongoose")
 
 //utility schema -> building schema
 var UtilitySchema = new mongoose.Schema({
-  type:String,description:String,image:String});
+  type:String,description:String,verified:Boolean});
 
 //building schema config
 var buildingSchema = new mongoose.Schema({
