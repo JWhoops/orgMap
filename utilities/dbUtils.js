@@ -189,7 +189,7 @@ const utilityDB = (() => {
     }
     return result;
   }
-  const updateUtility = (key, utility, callback) => {
+  const verifyUtility = (key, utility, callback) => {
     Building.findOne({
       "key": key
     }, (err, result) => {
@@ -280,11 +280,9 @@ const utilityDB = (() => {
       buildings)
   }
   return {
-    getJSONByKey,
-    insertByLevel,
     insertUtility,
     populateMadison,
-    updateUtility,
+    verifyUtility,
   }
 })()
 
