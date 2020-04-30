@@ -283,6 +283,7 @@ const utilityDB = (() => {
     insertUtility,
     populateMadison,
     verifyUtility,
+    getJSONByKey
   }
 })()
 
