@@ -2,6 +2,9 @@ const express = require("express"),
   bodyParser = require("body-parser"),
   DBUtilities = require("./utilities/dbUtils");
 
+const PORT = 8888;
+const HOST = "0.0.0.0";
+
 const app = express()
 var jsonParser = bodyParser.json()
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -62,6 +65,5 @@ app.post("/verify_code", jsonParser, (req, res) => {
 //   res.send("success")
 // })
 
-app.listen(8080, () => {
-  console.log("start running the server")
-})
+app.listen(PORT, HOST)
+console.log(`Running on http://${HOST}:${PORT}`);
