@@ -187,6 +187,7 @@ const utilityDB = (() => {
     }
     return result;
   }
+
   const verifyUtility = (key, utility, callback) => {
     Building.findOne({
       "key": key
