@@ -64,7 +64,7 @@ How to verify an utility:
 Utility in database will be verified if return success
 </pre>
 
-<h4>3. /get_code:</h4>
+<h4>4. /get_code:</h4>
 <pre>
 How to get email verification code:
 POST to /get_code with body format like:
@@ -82,7 +82,7 @@ code will be sent to the email, and the response will be:
 </code>
 </pre>
 
-<h4>4. /verify_code:</h4>
+<h4>5. /verify_code:</h4>
 <pre>
 How to get email verification code:
 POST to /verify_code with body format like:
