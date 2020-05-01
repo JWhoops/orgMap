@@ -23,6 +23,7 @@ app.get("/location/:location", (req, res) => {
  * insert utility to a building
  */
 app.post("/utility", jsonParser, (req, res) => {
+  //post utility to json
   let utility = { key: req.body.key, description: req.body.description, type: req.body.type, verified: false };
   DBUtilities.insertUtility(utility.key, utility, (bd) => {
     res.send(JSON.stringify(bd))
@@ -64,6 +65,6 @@ app.post("/verify_code", jsonParser, (req, res) => {
 //   DBUtilities.populateMadison();
 //   res.send("success")
 // })
-
+module.exports = app
 app.listen(PORT, HOST)
 console.log(`Running on http://${HOST}:${PORT}`);
