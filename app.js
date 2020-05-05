@@ -1,6 +1,7 @@
 const express = require("express"),
-  bodyParser = require("body-parser"),
-  DBUtilities = require("./utilities/dbUtils");
+  		bodyParser = require("body-parser"), 
+			DBUtilities = require("./utilities/dbUtils"),
+			cors = require("cors");
 
 const PORT = 8888;
 const HOST = "0.0.0.0";
@@ -8,6 +9,7 @@ const HOST = "0.0.0.0";
 const app = express()
 var jsonParser = bodyParser.json()
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cors());
 app.get('/favicon.ico', (req, res) => res.status(204));
 
 /**
@@ -29,6 +31,13 @@ app.post("/utility", jsonParser, (req, res) => {
   })
 })
 
+app.delete("/utility", jsonParser, (req, res) => {
+  let { key, utility } = req.body;
+  DBUtilities.deleteUtility(key, utility, (updateRes) => {
+    res.send(JSON.stringify(updateRes));
+  })
+})
+
 /**
  * verify utility
  */
@@ -42,8 +51,12 @@ app.post("/verification", jsonParser, (req, res) => {
 /**
  * Get Verification Code
  */
-app.post("/get_code", jsonParser, async (req, res) => {
+app.post("/get_code", jsonParser, (req, res) => {
   let { email } = req.body;
+	if(!email || email.length === 0) {
+		res.send(JSON.stringify({success: false, message: "Email cannot be null!"}));
+		return;
+	}
   DBUtilities.createCode(email, (result) => {
     res.send(JSON.stringify(result));
   });
@@ -54,6 +67,14 @@ app.post("/get_code", jsonParser, async (req, res) => {
  */
 app.post("/verify_code", jsonParser, (req, res) => {
   let { email, code } = req.body;
+	if(!email || email.length === 0) {
+		res.send(JSON.stringify({success: false, message: "Email cannot be null!"}));
+		return;
+	}
+	if(!code || code.length !== 6) {
+		res.send(JSON.stringify({success: false, message: "Invalid Code"}));
+		return;
+	}
   let codeObj = { email: email, code: code };
   DBUtilities.verifyCode(codeObj, (result) => {
     res.send(JSON.stringify(result));

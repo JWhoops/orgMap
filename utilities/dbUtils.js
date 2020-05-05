@@ -10,7 +10,7 @@ const utilityDB = (() => {
     Code = require("../models/code"),
     nodemailer = require("nodemailer");
 
-  mongoose.connect("mongodb://aa5330593:aa5330593@ds249583.mlab.com:49583/utility_map", {
+  mongoose.connect("mongodburl", {
     useNewUrlParser: true,
     useUnifiedTopology: true
   })
@@ -19,15 +19,18 @@ const utilityDB = (() => {
     service: "gmail",
     auth: {
       user: "username", // generated ethereal user
-      pass: "password" // generated ethereal password
+      pass: "gmail" // generated ethereal password
     }
   });
 
   const createCode = (email, callback) => {
     let code = [];
-    for (let i = 0; i < 6; i++) {
+		if(!email || email === "") {
+			callback({success: false, message: "Email cannot be null!"});
+			return;
+		}
+    for (let i = 0; i < 6; i++)
       code[i] = Math.floor(Math.random() * 10) + 1;
-    }
     Code.findOne({ email: email }, (err, rCode) => {
       if (!rCode) {
         code = new Code({ email: email, code: code.join("") })
@@ -38,11 +41,11 @@ const utilityDB = (() => {
             subject: "Verification Code From Campus Mail",
             text: "Hi there,\n\n Here is your verification code: " + code.code
           });
-          let resCode = { email: code.email, message: "code has sent" }
+          let resCode = { email: code.email, message: "code has been sent!" }
           callback(resCode);
         })
       } else {
-        callback({ result: "Code has sent!" });
+        callback({ result: "Code has been sent!" });
       }
     })
   }
@@ -264,6 +267,26 @@ const utilityDB = (() => {
     });
   }
 
+  const deleteUtility = (key, utility, callback) => {
+    Building.findOne({
+      "key": key
+    }, (err, result) => {
+      if (!result) {
+        callback({ "success": true, "error": "Building key is not found!!!" })
+        return;
+      }
+      for (let i = 0; i < result.utilities.length; i++) {
+        if (utility.description === result.utilities[i].description) {
+					result.utilities.splice(i, 1);	
+        }
+      }
+      result.save((err) => {
+        if (err) callback({ "success": false, "error": err })
+        else callback({ "success": true, "message": "utility is deleted" })
+      })
+    });
+  }
+
   //insert utility for buildings
   const insertUtility = (key, utility, callback) => {
     Building.findOne({
@@ -340,7 +363,8 @@ const utilityDB = (() => {
     verifyUtility,
     getJSONByKey,
     createCode,
-    verifyCode
+    verifyCode,
+		deleteUtility
   }
 })()
 
